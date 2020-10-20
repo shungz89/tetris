@@ -1,110 +1,81 @@
+import 'dart:math';
+
 void main() {
-  var playField = PlayField(10, 24);
+  var I = Tetromino([1, 1, 1, 1], width: 4);
   var O = Tetromino([1, 1, 1, 1], width: 2);
   var T = Tetromino([0, 1, 0, 1, 1, 1], width: 3);
-  var test = Tetromino([0, 1, 2, 3, 4, 5], width: 3);
+  var S = Tetromino([0, 1, 1, 1, 1, 0], width: 3);
+  var Z = Tetromino([1, 1, 0, 0, 1, 1], width: 3);
+  var J = Tetromino([1, 0, 0, 1, 1, 1], width: 3);
+  var L = Tetromino([0, 0, 1, 1, 1, 1], width: 3);
 
-  // 0, 1, 0, 1, 1, 1
-  // 1, 0, 1, 1, 1, 0
-  // 1, 1, 1, 0, 1, 0
-  // 0, 1, 1, 1, 0, 1
-  //
-  // print(T);
-  // T.rotateClockwise();
-  // print(T);
-  // T.rotateClockwise();
-  // print(T);
-  // T.rotateClockwise();
-  // print(T);
-  // T.rotateCounter();
-  // print(T);
-  // T.rotateCounter();
-  // print(T);
-  // T.rotateCounter();
-  // print(T);
+  var playField = PlayField(10, 24, tetrominos: [I, O, T, S, Z, J, L]);
 
-  print(playField);
-  print("");
-
-  playField.add(T);
-  print(playField);
-  print("");
-
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  print(playField);
-  print("");
-  playField.moveDown();
-  print(playField);
-  print("");
-
-  playField.add(T);
-  print(playField);
-  print("");
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  playField.moveDown();
-  print(playField);
-
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
+  playField.proceed();
 }
 
 class PlayField {
   final int width;
   final int height;
   final List<int> array;
+  final List<Tetromino> tetrominos;
   final int start;
+  Random rng = Random();
   Tetromino _current;
   int _currentIndex;
   List<int> _currentIndexList;
 
-  PlayField(this.width, this.height, {int start = 0})
+  PlayField(this.width, this.height,
+      {int start = 0, this.tetrominos = const []})
       : array = List.filled(width * height, 0),
         start = width ~/ 2;
+
+  Tetromino get random => tetrominos[rng.nextInt(tetrominos.length)];
 
   void add(Tetromino tetromino) {
     _current = tetromino;
     _currentIndexList = List(_current.array.length);
     _currentIndex = start;
     setCurrent(_currentIndex);
+  }
+
+  void proceed() {
+    if (_current == null || !moveDown()) {
+      add(random);
+    }
+    print(this);
   }
 
   List<int> createNewIndexList(int index) {
@@ -172,36 +143,42 @@ class PlayField {
     return newPosDown(index) < array.length;
   }
 
-  void moveRight() {
+  bool moveRight() {
     var newIndex = _currentIndex + 1;
     if (checkBeforeRightBoundary(newIndex) && !checkCollide(newIndex)) {
       unsetCurrent();
       _currentIndex = newIndex;
       setCurrent(_currentIndex);
+      return true;
     } else {
       print("Collided!");
+      return false;
     }
   }
 
-  void moveLeft() {
+  bool moveLeft() {
     var newIndex = _currentIndex - 1;
     if (checkBeforeLeftBoundary(newIndex) && !checkCollide(newIndex)) {
       unsetCurrent();
       _currentIndex = newIndex;
       setCurrent(_currentIndex);
+      return true;
     } else {
       print("Collided!");
+      return false;
     }
   }
 
-  void moveDown() {
+  bool moveDown() {
     var newIndex = _currentIndex + width;
     if (checkBeforeBottom(newIndex) && !checkCollide(newIndex)) {
       unsetCurrent();
       _currentIndex = newIndex;
       setCurrent(_currentIndex);
+      return true;
     } else {
       print("Collided!");
+      return false;
     }
   }
 
