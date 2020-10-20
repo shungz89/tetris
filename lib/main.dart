@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var J = Tetromino([1, 0, 0, 1, 1, 1], width: 3);
     var L = Tetromino([0, 0, 1, 1, 1, 1], width: 3);
 
-    _playField = PlayField(10, 18, tetrominos: [I, O, T, S, Z, J, L]);
+    _playField = PlayField(10, 16, tetrominos: [I, O, T, S, Z, J, L]);
   }
 
   @override
@@ -69,21 +69,54 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Container(
           // Center is a layout widget. It takes a single child and positions it
           // in the middle of the parent.
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisSpacing: 1.0,
-              mainAxisSpacing: 1.0,
-              crossAxisCount: _playField.width,
-            ),
-            itemCount: _playField.array.length,
-            itemBuilder: (context, index) {
-              var value = _playField.array[index];
-              if (value == 0) {
-                return Container(color: Colors.red);
-              } else {
-                return Container(color: Colors.blue);
-              }
-            },
+          child: Column(
+            children: [
+              Expanded(
+                child: GridView.builder(
+                  primary: false,
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 1.0,
+                    mainAxisSpacing: 1.0,
+                    crossAxisCount: _playField.width,
+                  ),
+                  itemCount: _playField.array.length,
+                  itemBuilder: (context, index) {
+                    var value = _playField.array[index];
+                    if (value == 0) {
+                      return Container(color: Colors.red);
+                    } else {
+                      return Container(color: Colors.blue);
+                    }
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_left),
+                    onPressed: () {
+                      setState(
+                        () {
+                          _playField.moveLeft();
+                        },
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.arrow_right),
+                    onPressed: () {
+                      setState(
+                        () {
+                          _playField.moveRight();
+                        },
+                      );
+                    },
+                  )
+                ],
+              )
+            ],
           ),
         ),
       ),
