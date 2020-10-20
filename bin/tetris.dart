@@ -30,37 +30,61 @@ void main() {
   print(playField);
   print("");
 
-  playField.moveLeft();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  print(playField);
+  print("");
+  playField.moveDown();
   print(playField);
   print("");
 
-  playField.moveLeft();
+  playField.add(T);
   print(playField);
   print("");
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  playField.moveDown();
+  print(playField);
 
-  playField.moveLeft();
-  print(playField);
-  print("");
-
-  playField.moveLeft();
-  print(playField);
-  print("");
-
-  playField.moveLeft();
-  print(playField);
-  print("");
-
-  playField.add(O);
-  print(playField);
-  print("");
-
-  playField.moveLeft();
-  print(playField);
-  print("");
-
-  playField.moveLeft();
-  print(playField);
-  print("");
 }
 
 class PlayField {
@@ -113,6 +137,14 @@ class PlayField {
     return index + _current.displayWidth - 1 - _current.topCenter;
   }
 
+  int newPosLeft(int index) {
+    return index - _current.displayWidth + 1 + _current.topCenter;
+  }
+
+  int newPosDown(int index) {
+    return index + width * (_current.displayHeight - 1);
+  }
+
   bool checkCollide(int index) {
     var newIndexList = createNewIndexList(index);
     var overlap = List.from(newIndexList);
@@ -126,11 +158,23 @@ class PlayField {
     return false;
   }
 
+  bool checkBeforeRightBoundary(int index) {
+    return index ~/ width == newPosRight(index) ~/ width &&
+        newPosRight(index) < array.length;
+  }
+
+  bool checkBeforeLeftBoundary(int index) {
+    return index ~/ width == newPosLeft(index) ~/ width &&
+        newPosLeft(index) >= 0;
+  }
+
+  bool checkBeforeBottom(int index) {
+    return newPosDown(index) < array.length;
+  }
+
   void moveRight() {
     var newIndex = _currentIndex + 1;
-    if (newIndex ~/ width == newPosRight(newIndex) ~/ width &&
-        newPosRight(newIndex) < array.length &&
-        !checkCollide(newIndex)) {
+    if (checkBeforeRightBoundary(newIndex) && !checkCollide(newIndex)) {
       unsetCurrent();
       _currentIndex = newIndex;
       setCurrent(_currentIndex);
@@ -139,15 +183,20 @@ class PlayField {
     }
   }
 
-  int newPosLeft(int index) {
-    return index - _current.displayWidth + 1 + _current.topCenter;
-  }
-
   void moveLeft() {
     var newIndex = _currentIndex - 1;
-    if (newIndex ~/ width == newPosLeft(newIndex) ~/ width &&
-        newPosLeft(newIndex) >= 0 &&
-        !checkCollide(newIndex)) {
+    if (checkBeforeLeftBoundary(newIndex) && !checkCollide(newIndex)) {
+      unsetCurrent();
+      _currentIndex = newIndex;
+      setCurrent(_currentIndex);
+    } else {
+      print("Collided!");
+    }
+  }
+
+  void moveDown() {
+    var newIndex = _currentIndex + width;
+    if (checkBeforeBottom(newIndex) && !checkCollide(newIndex)) {
       unsetCurrent();
       _currentIndex = newIndex;
       setCurrent(_currentIndex);
