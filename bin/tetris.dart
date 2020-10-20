@@ -8,74 +8,160 @@ void main() {
   // 1, 0, 1, 1, 1, 0
   // 1, 1, 1, 0, 1, 0
   // 0, 1, 1, 1, 0, 1
+  //
+  // print(T);
+  // T.rotateClockwise();
+  // print(T);
+  // T.rotateClockwise();
+  // print(T);
+  // T.rotateClockwise();
+  // print(T);
+  // T.rotateCounter();
+  // print(T);
+  // T.rotateCounter();
+  // print(T);
+  // T.rotateCounter();
+  // print(T);
 
-  print(T);
-  T.rotateClockwise();
-  print(T);
-  T.rotateClockwise();
-  print(T);
-  T.rotateClockwise();
-  print(T);
-  T.rotateCounter();
-  print(T);
-  T.rotateCounter();
-  print(T);
-  T.rotateCounter();
-  print(T);
+  print(playField);
+  print("");
 
-  // print(playField);
-  // playField.add(T);
-  // print("");
-  // print(playField);
-}
+  playField.add(T);
+  print(playField);
+  print("");
 
-class Coord {
-  final int x, y;
+  playField.moveLeft();
+  print(playField);
+  print("");
 
-  const Coord(this.x, this.y);
+  playField.moveLeft();
+  print(playField);
+  print("");
 
-  Coord operator +(Coord other) {
-    return Coord(this.x + other.x, this.y + other.y);
-  }
+  playField.moveLeft();
+  print(playField);
+  print("");
 
-  @override
-  String toString() {
-    return "($x, $y)";
-  }
+  playField.moveLeft();
+  print(playField);
+  print("");
+
+  playField.moveLeft();
+  print(playField);
+  print("");
+
+  playField.add(O);
+  print(playField);
+  print("");
+
+  playField.moveLeft();
+  print(playField);
+  print("");
+
+  playField.moveLeft();
+  print(playField);
+  print("");
 }
 
 class PlayField {
   final int width;
   final int height;
   final List<int> array;
-  final Coord start;
+  final int start;
   Tetromino _current;
-  Coord _currentCoord;
+  int _currentIndex;
+  List<int> _currentIndexList;
 
-  PlayField(this.width, this.height, {Coord start = const Coord(0, 0)})
+  PlayField(this.width, this.height, {int start = 0})
       : array = List.filled(width * height, 0),
-        start = Coord(0, width ~/ 2);
+        start = width ~/ 2;
 
   void add(Tetromino tetromino) {
     _current = tetromino;
-    _currentCoord = start;
-    for (int i = 0; i < _current.array.length; i++) {
-      var tetCoord = _current.indexToCoord(i);
-      var localCoord = tetCoord + _currentCoord;
-      set(localCoord, _current.array[i]);
+    _currentIndexList = List(_current.array.length);
+    _currentIndex = start;
+    setCurrent(_currentIndex);
+  }
+
+  List<int> createNewIndexList(int index) {
+    var newIndexList = List<int>(_currentIndexList.length);
+    for (int i = 0; i < newIndexList.length; i++) {
+      var newIndex = index +
+          (i % _current.displayWidth) +
+          (i ~/ _current.displayWidth * width) -
+          _current.topCenter;
+      newIndexList[i] = newIndex;
+    }
+    return newIndexList;
+  }
+
+  void setCurrent(int index) {
+    var newIndexList = createNewIndexList(index);
+    _currentIndexList = newIndexList;
+    for (int i = 0; i < _currentIndexList.length; i++) {
+      set(_currentIndexList[i], _current.array[i]);
     }
   }
 
-  int coordToIndex(Coord coord) {
-    return coord.x * width + coord.y;
+  void unsetCurrent() {
+    for (int i = 0; i < _currentIndexList.length; i++) {
+      unset(_currentIndexList[i]);
+    }
   }
 
-  void set(Coord coord, int bit) {
-    array[coordToIndex(coord)] = bit;
+  int newPosRight(int index) {
+    return index + _current.displayWidth - 1 - _current.topCenter;
   }
 
-  void unset(Coord coord) {
-    array[coordToIndex(coord)] = 0;
+  bool checkCollide(int index) {
+    var newIndexList = createNewIndexList(index);
+    var overlap = List.from(newIndexList);
+    overlap.removeWhere((index) => _currentIndexList.contains(index));
+    for (int i = 0; i < overlap.length; i++) {
+      var newIndex = overlap[i];
+      if (array[newIndex] + _current.display[i] > 1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void moveRight() {
+    var newIndex = _currentIndex + 1;
+    if (newIndex ~/ width == newPosRight(newIndex) ~/ width &&
+        newPosRight(newIndex) < array.length &&
+        !checkCollide(newIndex)) {
+      unsetCurrent();
+      _currentIndex = newIndex;
+      setCurrent(_currentIndex);
+    } else {
+      print("Collided!");
+    }
+  }
+
+  int newPosLeft(int index) {
+    return index - _current.displayWidth + 1 + _current.topCenter;
+  }
+
+  void moveLeft() {
+    var newIndex = _currentIndex - 1;
+    if (newIndex ~/ width == newPosLeft(newIndex) ~/ width &&
+        newPosLeft(newIndex) >= 0 &&
+        !checkCollide(newIndex)) {
+      unsetCurrent();
+      _currentIndex = newIndex;
+      setCurrent(_currentIndex);
+    } else {
+      print("Collided!");
+    }
+  }
+
+  void set(int index, int bit) {
+    array[index] += bit;
+  }
+
+  void unset(int index) {
+    array[index] = 0;
   }
 
   @override
@@ -110,9 +196,11 @@ class Tetromino {
 
   List<int> get display => List.unmodifiable(_display);
 
-  Coord indexToCoord(int index) {
-    return Coord(index ~/ _displayWidth, index % _displayWidth);
-  }
+  int get displayWidth => _displayWidth;
+
+  int get displayHeight => _displayHeight;
+
+  int get topCenter => _displayWidth ~/ 2;
 
   int clockwiseFormula(int i) {
     return (i % _displayWidth + 1) * _displayHeight - (i ~/ _displayWidth + 1);
