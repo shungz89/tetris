@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var L = Tetromino([0, 0, 1, 1, 1, 1], width: 3);
 
     var tetrominos = [I, O, T, S, Z, J, L];
-    _playField = PlayField(10, 16, tetrominos: [I]);
+    _playField = PlayField(10, 16, tetrominos: tetrominos);
   }
 
   @override
