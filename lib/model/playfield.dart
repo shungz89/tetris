@@ -146,7 +146,8 @@ class PlayField {
     _current.rotateClockwise();
     _currentIndex = min(
       _currentIndex,
-      (_currentIndex ~/ width + 1) * width - _current.topCenter,
+      (_currentIndex ~/ width + 1) * width -
+          (_current.displayWidth - _current.topCenter),
     );
     _setCurrent(_currentIndex);
   }
