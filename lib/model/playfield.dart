@@ -77,7 +77,10 @@ class PlayField {
   }
 
   int _calcPosLeft(int index) {
-    return index - _current.displayWidth + _current.displayWidth - _current.topCenter;
+    return index -
+        _current.displayWidth +
+        _current.displayWidth -
+        _current.topCenter;
   }
 
   int calcPosDown(int index) {
@@ -86,9 +89,8 @@ class PlayField {
 
   bool _checkCollide(int index) {
     var newIndexList = _createNewIndexList(index);
-    var nextIndexList = List.from(newIndexList);
     for (int i = 0; i < newIndexList.length; i++) {
-      var newIndex = nextIndexList[i];
+      var newIndex = newIndexList[i];
       if (_currentIndexList.contains(newIndex)) continue;
       if (array[newIndex] + _current.display[i] > 1) {
         return true;
@@ -98,14 +100,14 @@ class PlayField {
   }
 
   bool _checkBeforeRightBoundary(int index) {
-    return _calcPosRight(index) ~/ width == _calcPosRight(_currentIndex) ~/ width &&
+    return _calcPosRight(index) ~/ width ==
+            _calcPosRight(_currentIndex) ~/ width &&
         _calcPosRight(index) < array.length;
   }
 
   bool _checkBeforeLeftBoundary(int index) {
-    print(_calcPosLeft(index));
-    print(_calcPosLeft(_currentIndex));
-    return _calcPosLeft(index) ~/ width == _calcPosLeft(_currentIndex) ~/ width &&
+    return _calcPosLeft(index) ~/ width ==
+            _calcPosLeft(_currentIndex) ~/ width &&
         _calcPosLeft(index) >= 0;
   }
 
@@ -131,6 +133,10 @@ class PlayField {
     if (_current == null) return;
     _unsetCurrent();
     _current.rotateCounter();
+    _currentIndex = max(
+      _currentIndex,
+      _currentIndex ~/ width * width + _current.topCenter,
+    );
     _setCurrent(_currentIndex);
   }
 
@@ -138,6 +144,10 @@ class PlayField {
     if (_current == null) return;
     _unsetCurrent();
     _current.rotateClockwise();
+    _currentIndex = min(
+      _currentIndex,
+      (_currentIndex ~/ width + 1) * width - _current.topCenter,
+    );
     _setCurrent(_currentIndex);
   }
 
