@@ -20,18 +20,22 @@ class PlayField {
 
   Tetromino get random => tetrominos[_rng.nextInt(tetrominos.length)];
 
-  void _add(Tetromino tetromino) {
+  bool _add(Tetromino tetromino) {
     _current = tetromino;
     _currentIndexList = List(_current.array.length);
     _currentIndex = start;
-    _setCurrent(_currentIndex);
+    return _setCurrent(_currentIndex);
   }
 
-  void proceed() {
+  bool proceed() {
     if (_current == null || !moveDown()) {
-      _add(random);
+      if (!_add(random)) {
+        print("Game Over!");
+        return false;
+      }
     }
     print(this);
+    return true;
   }
 
   List<int> _createNewIndexList(int index) {
@@ -46,12 +50,14 @@ class PlayField {
     return newIndexList;
   }
 
-  void _setCurrent(int index) {
+  bool _setCurrent(int index) {
     var newIndexList = _createNewIndexList(index);
     _currentIndexList = newIndexList;
     for (int i = 0; i < _currentIndexList.length; i++) {
-      _set(_currentIndexList[i], _current.array[i]);
+      var value = _set(_currentIndexList[i], _current.array[i]);
+      if (value > 1) return false;
     }
+    return true;
   }
 
   void _unsetCurrent() {
@@ -74,10 +80,10 @@ class PlayField {
 
   bool _checkCollide(int index) {
     var newIndexList = _createNewIndexList(index);
-    var overlap = List.from(newIndexList);
-    overlap.removeWhere((index) => _currentIndexList.contains(index));
-    for (int i = 0; i < overlap.length; i++) {
-      var newIndex = overlap[i];
+    var nextIndexList = List.from(newIndexList);
+    for (int i = 0; i < newIndexList.length; i++) {
+      var newIndex = nextIndexList[i];
+      if (_currentIndexList.contains(newIndex)) continue;
       if (array[newIndex] + _current.display[i] > 1) {
         return true;
       }
@@ -138,8 +144,9 @@ class PlayField {
     }
   }
 
-  void _set(int index, int bit) {
+  int _set(int index, int bit) {
     array[index] += bit;
+    return array[index];
   }
 
   void _unset(int index) {
