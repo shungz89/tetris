@@ -72,15 +72,15 @@ class PlayField {
     }
   }
 
-  int _newPosRight(int index) {
+  int _calcPosRight(int index) {
     return index + _current.displayWidth - 1 - _current.topCenter;
   }
 
-  int _newPosLeft(int index) {
-    return index - _current.displayWidth + 1 + _current.topCenter;
+  int _calcPosLeft(int index) {
+    return index - _current.displayWidth + _current.displayWidth - _current.topCenter;
   }
 
-  int _newPosDown(int index) {
+  int calcPosDown(int index) {
     return index + width * (_current.displayHeight - 1);
   }
 
@@ -98,17 +98,19 @@ class PlayField {
   }
 
   bool _checkBeforeRightBoundary(int index) {
-    return index ~/ width == _newPosRight(index) ~/ width &&
-        _newPosRight(index) < array.length;
+    return _calcPosRight(index) ~/ width == _calcPosRight(_currentIndex) ~/ width &&
+        _calcPosRight(index) < array.length;
   }
 
   bool _checkBeforeLeftBoundary(int index) {
-    return index ~/ width == _newPosLeft(index) ~/ width &&
-        _newPosLeft(index) >= 0;
+    print(_calcPosLeft(index));
+    print(_calcPosLeft(_currentIndex));
+    return _calcPosLeft(index) ~/ width == _calcPosLeft(_currentIndex) ~/ width &&
+        _calcPosLeft(index) >= 0;
   }
 
   bool _checkBeforeBottom(int index) {
-    return _newPosDown(index) < array.length;
+    return calcPosDown(index) < array.length;
   }
 
   bool moveRight() {
@@ -126,17 +128,17 @@ class PlayField {
   }
 
   void rotateLeft() {
+    if (_current == null) return;
     _unsetCurrent();
     _current.rotateCounter();
     _setCurrent(_currentIndex);
   }
 
   void rotateRight() {
+    if (_current == null) return;
     _unsetCurrent();
     _current.rotateClockwise();
     _setCurrent(_currentIndex);
-    print(_current);
-    print(_currentIndexList);
   }
 
   bool moveLeft() {

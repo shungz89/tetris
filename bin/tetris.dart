@@ -13,13 +13,22 @@ void main() {
   var playField = PlayField(10, 24, tetrominos: [T]);
 
   playField.proceed();
-  playField.rotateRight();
+  playField.moveDown();
+  playField.moveLeft();
   print(playField);
   playField.rotateRight();
   print(playField);
-  playField.rotateRight();
+  playField.moveLeft();
   print(playField);
-  playField.rotateRight();
+  playField.moveLeft();
+  print(playField);
+  playField.moveLeft();
+  print(playField);
+  playField.moveLeft();
+  print(playField);
+  playField.moveLeft();
+  print(playField);
+  playField.moveLeft();
   print(playField);
 
 }
