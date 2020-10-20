@@ -22,15 +22,21 @@ class PlayField {
 
   bool _add(Tetromino tetromino) {
     _current = tetromino;
-    _currentIndexList = List(_current.array.length);
+    _currentIndexList = List(_current.display.length);
     _currentIndex = start;
     return _setCurrent(_currentIndex);
+  }
+
+  void reset() {
+    _current = null;
+    array.fillRange(0, array.length, 0);
   }
 
   bool proceed() {
     if (_current == null || !moveDown()) {
       if (!_add(random)) {
         print("Game Over!");
+        _current = null;
         return false;
       }
     }
@@ -54,7 +60,7 @@ class PlayField {
     var newIndexList = _createNewIndexList(index);
     _currentIndexList = newIndexList;
     for (int i = 0; i < _currentIndexList.length; i++) {
-      var value = _set(_currentIndexList[i], _current.array[i]);
+      var value = _set(_currentIndexList[i], _current.display[i]);
       if (value > 1) return false;
     }
     return true;
@@ -106,6 +112,7 @@ class PlayField {
   }
 
   bool moveRight() {
+    if (_current == null) return false;
     var newIndex = _currentIndex + 1;
     if (_checkBeforeRightBoundary(newIndex) && !_checkCollide(newIndex)) {
       _unsetCurrent();
@@ -118,7 +125,22 @@ class PlayField {
     }
   }
 
+  void rotateLeft() {
+    _unsetCurrent();
+    _current.rotateCounter();
+    _setCurrent(_currentIndex);
+  }
+
+  void rotateRight() {
+    _unsetCurrent();
+    _current.rotateClockwise();
+    _setCurrent(_currentIndex);
+    print(_current);
+    print(_currentIndexList);
+  }
+
   bool moveLeft() {
+    if (_current == null) return false;
     var newIndex = _currentIndex - 1;
     if (_checkBeforeLeftBoundary(newIndex) && !_checkCollide(newIndex)) {
       _unsetCurrent();
@@ -132,6 +154,7 @@ class PlayField {
   }
 
   bool moveDown() {
+    if (_current == null) return false;
     var newIndex = _currentIndex + width;
     if (_checkBeforeBottom(newIndex) && !_checkCollide(newIndex)) {
       _unsetCurrent();

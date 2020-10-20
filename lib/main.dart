@@ -43,13 +43,19 @@ class _MyHomePageState extends State<MyHomePage> {
     var J = Tetromino([1, 0, 0, 1, 1, 1], width: 3);
     var L = Tetromino([0, 0, 1, 1, 1, 1], width: 3);
 
-    _playField = PlayField(10, 16, tetrominos: [I, O, T, S, Z, J, L]);
+    var tetrominos = [I, O, T, S, Z, J, L];
+    _playField = PlayField(10, 16, tetrominos: [T]);
   }
 
   @override
   void initState() {
     super.initState();
     _setup();
+    startTimer();
+  }
+
+  void startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(Duration(milliseconds: 500), (_) {
       setState(() {
         if (!_playField.proceed()) {
@@ -64,6 +70,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Tetris"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                _playField.reset();
+                startTimer();
+              });
+            },
+          )
+        ],
       ),
       body: SafeArea(
         child: Container(
@@ -95,25 +112,37 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   IconButton(
+                    icon: Icon(Icons.rotate_left),
+                    onPressed: () {
+                      setState(() {
+                        _playField.rotateLeft();
+                      });
+                    },
+                  ),
+                  IconButton(
                     icon: Icon(Icons.arrow_left),
                     onPressed: () {
-                      setState(
-                        () {
-                          _playField.moveLeft();
-                        },
-                      );
+                      setState(() {
+                        _playField.moveLeft();
+                      });
                     },
                   ),
                   IconButton(
                     icon: Icon(Icons.arrow_right),
                     onPressed: () {
-                      setState(
-                        () {
-                          _playField.moveRight();
-                        },
-                      );
+                      setState(() {
+                        _playField.moveRight();
+                      });
                     },
-                  )
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.rotate_right),
+                    onPressed: () {
+                      setState(() {
+                        _playField.rotateRight();
+                      });
+                    },
+                  ),
                 ],
               )
             ],

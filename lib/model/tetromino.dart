@@ -1,19 +1,19 @@
 class Tetromino {
-  final List<int> array;
-  final int width;
-  final int height;
+  final List<int> _array;
+  final int _width;
+  final int _height;
   int _rotation = 0;
   List<int> _display;
   int _displayWidth;
   int _displayHeight;
 
-  Tetromino(this.array, {int width, int height})
+  Tetromino(this._array, {int width, int height})
       : assert(width != null || height != null),
-        width = width ?? (array.length ~/ height),
-        height = height ?? (array.length ~/ width) {
-    _display = this.array;
-    _displayWidth = this.width;
-    _displayHeight = this.height;
+        _width = width ?? (_array.length ~/ height),
+        _height = height ?? (_array.length ~/ width) {
+    _display = this._array;
+    _displayWidth = this._width;
+    _displayHeight = this._height;
   }
 
   List<int> get display => List.unmodifiable(_display);
