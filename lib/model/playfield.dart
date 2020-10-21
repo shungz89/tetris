@@ -82,7 +82,9 @@ class PlayField {
 
   void _unsetCurrent() {
     for (int i = 0; i < _currentIndexList.length; i++) {
-      _unset(_currentIndexList[i]);
+      if (_current.display[i] == 1) {
+        _unset(_currentIndexList[i]);
+      }
     }
   }
 
@@ -105,7 +107,6 @@ class PlayField {
     var newIndexList = _createNewIndexList(index);
     for (int i = 0; i < newIndexList.length; i++) {
       var newIndex = newIndexList[i];
-      if (_currentIndexList.contains(newIndex)) continue;
       if (array[newIndex] + _current.display[i] > 1) {
         return true;
       }
@@ -127,20 +128,6 @@ class PlayField {
 
   bool _checkBeforeBottom(int index) {
     return calcPosDown(index) < array.length;
-  }
-
-  bool moveRight() {
-    if (_current == null) return false;
-    var newIndex = _currentIndex + 1;
-    if (_checkBeforeRightBoundary(newIndex) && !_checkCollide(newIndex)) {
-      _unsetCurrent();
-      _currentIndex = newIndex;
-      _setCurrent(_currentIndex);
-      return true;
-    } else {
-      print("Collided!");
-      return false;
-    }
   }
 
   void rotateLeft() {
@@ -166,15 +153,31 @@ class PlayField {
     _setCurrent(_currentIndex);
   }
 
-  bool moveLeft() {
+  bool moveRight() {
     if (_current == null) return false;
-    var newIndex = _currentIndex - 1;
-    if (_checkBeforeLeftBoundary(newIndex) && !_checkCollide(newIndex)) {
-      _unsetCurrent();
+    var newIndex = _currentIndex + 1;
+    _unsetCurrent();
+    if (_checkBeforeRightBoundary(newIndex) && !_checkCollide(newIndex)) {
       _currentIndex = newIndex;
       _setCurrent(_currentIndex);
       return true;
     } else {
+      _setCurrent(_currentIndex);
+      print("Collided!");
+      return false;
+    }
+  }
+
+  bool moveLeft() {
+    if (_current == null) return false;
+    var newIndex = _currentIndex - 1;
+    _unsetCurrent();
+    if (_checkBeforeLeftBoundary(newIndex) && !_checkCollide(newIndex)) {
+      _currentIndex = newIndex;
+      _setCurrent(_currentIndex);
+      return true;
+    } else {
+      _setCurrent(_currentIndex);
       print("Collided!");
       return false;
     }
@@ -183,12 +186,13 @@ class PlayField {
   bool moveDown() {
     if (_current == null) return false;
     var newIndex = _currentIndex + width;
+    _unsetCurrent();
     if (_checkBeforeBottom(newIndex) && !_checkCollide(newIndex)) {
-      _unsetCurrent();
       _currentIndex = newIndex;
       _setCurrent(_currentIndex);
       return true;
     } else {
+      _setCurrent(_currentIndex);
       print("Collided!");
       return false;
     }
