@@ -58,20 +58,20 @@ class PlayField {
     return true;
   }
 
-  List<int> _createNewIndexList(int index) {
-    var newIndexList = List<int>(_currentIndexList.length);
+  List<int> _createNewIndexList(int index, Tetromino tetromino) {
+    var newIndexList = List<int>(tetromino.display.length);
     for (int i = 0; i < newIndexList.length; i++) {
       var newIndex = index +
-          (i % _current.displayWidth) +
-          (i ~/ _current.displayWidth * width) -
-          _current.topCenter;
+          (i % tetromino.displayWidth) +
+          (i ~/ tetromino.displayWidth * width) -
+          tetromino.topCenter;
       newIndexList[i] = newIndex;
     }
     return newIndexList;
   }
 
   bool _setCurrent(int index) {
-    var newIndexList = _createNewIndexList(index);
+    var newIndexList = _createNewIndexList(index, _current);
     _currentIndexList = newIndexList;
     for (int i = 0; i < _currentIndexList.length; i++) {
       var value = _set(_currentIndexList[i], _current.display[i]);
@@ -88,76 +88,94 @@ class PlayField {
     }
   }
 
-  int _calcPosRight(int index) {
-    return index + _current.displayWidth - 1 - _current.topCenter;
+  int _calcPosRight(int index, Tetromino tetromino) {
+    return index + tetromino.displayWidth - 1 - tetromino.topCenter;
   }
 
-  int _calcPosLeft(int index) {
+  int _calcPosLeft(int index, Tetromino tetromino) {
     return index -
-        _current.displayWidth +
-        _current.displayWidth -
-        _current.topCenter;
+        tetromino.displayWidth +
+        tetromino.displayWidth -
+        tetromino.topCenter;
   }
 
-  int calcPosDown(int index) {
-    return index + width * (_current.displayHeight - 1);
+  int calcPosDown(int index, Tetromino tetromino) {
+    return index + width * (tetromino.displayHeight - 1);
   }
 
-  bool _checkCollide(int index) {
-    var newIndexList = _createNewIndexList(index);
+  bool _checkCollide(int index, Tetromino tetromino) {
+    var newIndexList = _createNewIndexList(index, tetromino);
     for (int i = 0; i < newIndexList.length; i++) {
       var newIndex = newIndexList[i];
-      if (array[newIndex] + _current.display[i] > 1) {
+      if (array[newIndex] + tetromino.display[i] > 1) {
         return true;
       }
     }
     return false;
   }
 
-  bool _checkBeforeRightBoundary(int index) {
-    return _calcPosRight(index) ~/ width ==
-            _calcPosRight(_currentIndex) ~/ width &&
-        _calcPosRight(index) < array.length;
+  bool _checkBeforeRight(int index, Tetromino tetromino) {
+    return _calcPosRight(index, tetromino) ~/ width ==
+            _calcPosRight(_currentIndex, tetromino) ~/ width &&
+        _calcPosRight(index, tetromino) < array.length;
   }
 
-  bool _checkBeforeLeftBoundary(int index) {
-    return _calcPosLeft(index) ~/ width ==
-            _calcPosLeft(_currentIndex) ~/ width &&
-        _calcPosLeft(index) >= 0;
+  bool _checkBeforeLeft(int index, Tetromino tetromino) {
+    return _calcPosLeft(index, tetromino) ~/ width ==
+            _calcPosLeft(_currentIndex, tetromino) ~/ width &&
+        _calcPosLeft(index, tetromino) >= 0;
   }
 
-  bool _checkBeforeBottom(int index) {
-    return calcPosDown(index) < array.length;
+  bool _checkBeforeBottom(int index, Tetromino tetromino) {
+    return calcPosDown(index, tetromino) < array.length;
   }
 
-  void rotateLeft() {
-    if (_current == null) return;
+  bool rotateLeft() {
+    if (_current == null) return false;
     _unsetCurrent();
-    _current.rotateCounter();
-    _currentIndex = max(
+    var rotate = _current.clone().rotateCounter();
+    var newIndex = max(
       _currentIndex,
-      _currentIndex ~/ width * width + _current.topCenter,
+      _currentIndex ~/ width * width + _current.centerLeft,
     );
-    _setCurrent(_currentIndex);
+    if (!_checkCollide(newIndex, rotate)) {
+      _current.rotateCounter();
+      _currentIndex = newIndex;
+      _setCurrent(_currentIndex);
+      return true;
+    } else {
+      _setCurrent(_currentIndex);
+      print("Collided!");
+      return false;
+    }
   }
 
-  void rotateRight() {
-    if (_current == null) return;
+  bool rotateRight() {
+    if (_current == null) return false;
     _unsetCurrent();
-    _current.rotateClockwise();
-    _currentIndex = min(
-      _currentIndex,
-      (_currentIndex ~/ width + 1) * width -
-          (_current.displayWidth - _current.topCenter),
-    );
-    _setCurrent(_currentIndex);
+    var rotate = _current.clone().rotateClockwise();
+    var newIndex = min(
+        _currentIndex,
+        (_currentIndex ~/ width + 1) * width -
+            (_current.displayHeight - _current.centerLeft));
+    if (!_checkCollide(newIndex, rotate)) {
+      _current.rotateClockwise();
+      _currentIndex = newIndex;
+      _setCurrent(_currentIndex);
+      return true;
+    } else {
+      _setCurrent(_currentIndex);
+      print("Collided!");
+      return false;
+    }
   }
 
   bool moveRight() {
     if (_current == null) return false;
     var newIndex = _currentIndex + 1;
     _unsetCurrent();
-    if (_checkBeforeRightBoundary(newIndex) && !_checkCollide(newIndex)) {
+    if (_checkBeforeRight(newIndex, _current) &&
+        !_checkCollide(newIndex, _current)) {
       _currentIndex = newIndex;
       _setCurrent(_currentIndex);
       return true;
@@ -172,7 +190,8 @@ class PlayField {
     if (_current == null) return false;
     var newIndex = _currentIndex - 1;
     _unsetCurrent();
-    if (_checkBeforeLeftBoundary(newIndex) && !_checkCollide(newIndex)) {
+    if (_checkBeforeLeft(newIndex, _current) &&
+        !_checkCollide(newIndex, _current)) {
       _currentIndex = newIndex;
       _setCurrent(_currentIndex);
       return true;
@@ -187,7 +206,8 @@ class PlayField {
     if (_current == null) return false;
     var newIndex = _currentIndex + width;
     _unsetCurrent();
-    if (_checkBeforeBottom(newIndex) && !_checkCollide(newIndex)) {
+    if (_checkBeforeBottom(newIndex, _current) &&
+        !_checkCollide(newIndex, _current)) {
       _currentIndex = newIndex;
       _setCurrent(_currentIndex);
       return true;

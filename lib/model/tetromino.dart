@@ -25,6 +25,8 @@ class Tetromino {
 
   int get topCenter => _displayWidth ~/ 2;
 
+  int get centerLeft => _displayHeight ~/ 2;
+
   int clockwiseFormula(int i) {
     return (i % _displayWidth + 1) * _displayHeight - (i ~/ _displayWidth + 1);
   }
@@ -33,7 +35,7 @@ class Tetromino {
     return _display.length - 1 - clockwiseFormula(i);
   }
 
-  void rotateClockwise() {
+  Tetromino rotateClockwise() {
     _rotation = (_rotation + 90) % 360;
     var newArray = List<int>(_display.length);
     for (int i = 0; i < newArray.length; i++) {
@@ -44,9 +46,10 @@ class Tetromino {
     _displayWidth = oldHeight;
 
     _display = newArray;
+    return this;
   }
 
-  void rotateCounter() {
+  Tetromino rotateCounter() {
     _rotation = (_rotation - 90).abs() % 360;
     var newArray = List<int>(_display.length);
     for (int i = 0; i < newArray.length; i++) {
@@ -57,6 +60,7 @@ class Tetromino {
     _displayWidth = oldHeight;
 
     _display = newArray;
+    return this;
   }
 
   Tetromino clone() {
