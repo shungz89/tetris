@@ -2,15 +2,16 @@ class Tetromino {
   final List<int> _array;
   final int _width;
   final int _height;
-  int _rotation = 0;
+  int _rotation;
   List<int> _display;
   int _displayWidth;
   int _displayHeight;
 
-  Tetromino(this._array, {int width, int height})
+  Tetromino(this._array, {int width, int height, int rotation = 0})
       : assert(width != null || height != null),
         _width = width ?? (_array.length ~/ height),
         _height = height ?? (_array.length ~/ width) {
+    _rotation = rotation;
     _display = this._array;
     _displayWidth = this._width;
     _displayHeight = this._height;
@@ -56,6 +57,10 @@ class Tetromino {
     _displayWidth = oldHeight;
 
     _display = newArray;
+  }
+
+  Tetromino clone() {
+    return Tetromino(_display, width: _displayWidth, rotation: _rotation);
   }
 
   @override

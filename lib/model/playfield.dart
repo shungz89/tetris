@@ -34,7 +34,21 @@ class PlayField {
 
   bool proceed() {
     if (_current == null || !moveDown()) {
-      if (!_add(random)) {
+      var newList = List.of(array);
+      var removed = 0;
+      for (int i = height - 1; i >= 0; i--) {
+        if (newList
+            .sublist(width * i, width * i + width)
+            .every((value) => value == 1)) {
+          removed++;
+          newList.removeRange(width * i, width * i + width);
+        }
+      }
+      if (removed > 0) {
+        newList.insertAll(0, List.filled(width * removed, 0));
+        array.setAll(0, newList);
+      }
+      if (!_add(random.clone())) {
         print("Game Over!");
         _current = null;
         return false;
